@@ -3,6 +3,7 @@ from datetime import datetime
 
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 from app.db.base import Base
 
@@ -43,4 +44,10 @@ class User(Base):
         DateTime,
         default=datetime.utcnow,
         nullable=False
+    )
+
+    documents = relationship(
+        "Document",
+        back_populates="owner",
+        cascade="all, delete-orphan"
     )
