@@ -25,6 +25,7 @@ class DocumentRepository:
 
         return document
 
+
     def get_documents_by_user(self, user_id):
         return (
             self.db.query(Document)
@@ -32,3 +33,26 @@ class DocumentRepository:
             .order_by(Document.upload_time.desc())
             .all()
         )
+    
+    
+    def get_by_id(self, document_id):
+        return (
+            self.db.query(Document)
+            .filter(Document.id == document_id)
+            .first()
+        )
+
+
+    def update_status(
+        self,
+        document_id,
+        status: str
+    ):
+        document = self.get_by_id(document_id)
+
+        if document:
+            document.processing_status = status
+            self.db.commit()
+            self.db.refresh(document)
+
+        return document

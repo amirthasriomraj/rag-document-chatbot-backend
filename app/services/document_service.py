@@ -2,7 +2,7 @@ from fastapi import UploadFile
 
 from app.repositories.document_repo import DocumentRepository
 from app.utils.file_storage import save_uploaded_file
-
+from app.workers.tasks import process_document_task
 
 ALLOWED_EXTENSIONS = {".pdf", ".docx"}
 
@@ -34,4 +34,10 @@ class DocumentService:
             file_path=file_path
         )
 
+        process_document_task.delay(
+            str(document.id)
+        )
+
         return document
+
+       
