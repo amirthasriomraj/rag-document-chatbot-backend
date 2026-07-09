@@ -56,3 +56,61 @@ class DocumentRepository:
             self.db.refresh(document)
 
         return document
+    
+
+    def get_by_id_and_user(
+        self,
+        document_id,
+        user_id
+    ):
+        return (
+            self.db.query(Document)
+            .filter(
+                Document.id == document_id,
+                Document.user_id == user_id
+            )
+            .first()
+        )
+    
+
+    def delete_document(
+        self,
+        document
+    ):
+        self.db.delete(document)
+        self.db.commit()
+
+
+    def get_document_summary(
+        self,
+        user_id
+    ):
+        documents = (
+            self.db.query(Document)
+            .filter(Document.user_id == user_id)
+            .all()
+        )
+
+        total_documents = len(documents)
+
+        completed_documents = len([
+            d for d in documents
+            if d.processing_status == "COMPLETED"
+        ])
+
+        processing_documents = len([
+            d for d in documents
+            if d.processing_status == "PROCESSING"
+        ])
+
+        failed_documents = len([
+            d for d in documents
+            if d.processing_status == "FAILED"
+        ])
+
+        return {
+            "total_documents": total_documents,
+            "completed_documents": completed_documents,
+            "processing_documents": processing_documents,
+            "failed_documents": failed_documents
+        }

@@ -56,3 +56,9 @@ class Document(Base):
         "User",
         back_populates="documents"
     )
+
+    embeddings = relationship(
+        "DocumentEmbedding",
+        back_populates="document",
+        cascade="all, delete-orphan"
+    )

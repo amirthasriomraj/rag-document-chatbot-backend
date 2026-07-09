@@ -1,0 +1,40 @@
+import uuid
+
+from pgvector.sqlalchemy import Vector
+from sqlalchemy import Column, ForeignKey, Text
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+
+from app.db.base import Base
+
+
+class DocumentEmbedding(Base):
+    __tablename__ = "document_embeddings"
+
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+    )
+
+    document_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("documents.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+
+    chunk_text = Column(
+        Text,
+        nullable=False
+    )
+
+    embedding = Column(
+        Vector(1536),
+        nullable=False
+    )
+
+    document = relationship(
+        "Document",
+        back_populates="embeddings"
+    )

@@ -8,3 +8,4 @@ __pycache__/
 .chromadb/
 .pytest_cache/
 uploads/
+chroma_db/
