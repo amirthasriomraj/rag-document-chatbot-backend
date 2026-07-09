@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -58,16 +58,27 @@ def ask_question(
 
 @router.get("/history")
 def get_chat_history(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     chat_repo = ChatRepository(db)
 
+    skip = (page - 1) * page_size
+
     chats = chat_repo.get_user_chats(
-        current_user.id
+        user_id=current_user.id,
+        skip=skip,
+        limit=page_size
     )
+
+    response = [
+        ChatHistoryItem.model_validate(chat)
+        for chat in chats
+    ]
 
     return {
         "success": True,
-        "data": chats
+        "data": response
     }

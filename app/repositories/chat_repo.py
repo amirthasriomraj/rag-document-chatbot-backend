@@ -29,12 +29,16 @@ class ChatRepository:
 
     def get_user_chats(
         self,
-        user_id
+        user_id,
+        skip=0,
+        limit=10
     ):
         return (
             self.db.query(Chat)
             .filter(Chat.user_id == user_id)
             .order_by(Chat.created_at.desc())
+            .offset(skip)
+            .limit(limit)
             .all()
         )
     

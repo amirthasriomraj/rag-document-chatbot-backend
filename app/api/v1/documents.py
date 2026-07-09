@@ -4,6 +4,7 @@ from fastapi import (
     HTTPException,
     UploadFile,
     File,
+    Query,
 )
 from sqlalchemy.orm import Session
 from typing import List
@@ -59,18 +60,29 @@ def upload_document(
 
 @router.get("")
 def list_documents(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     repo = DocumentRepository(db)
 
+    skip = (page - 1) * page_size
+
     documents = repo.get_documents_by_user(
-        current_user.id
+        user_id=current_user.id,
+        skip=skip,
+        limit=page_size
     )
+
+    response = [
+        DocumentListItem.model_validate(doc)
+        for doc in documents
+    ]
 
     return {
         "success": True,
-        "data": documents
+        "data": response
     }
 
 
